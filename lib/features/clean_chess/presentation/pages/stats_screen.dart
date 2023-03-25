@@ -1,6 +1,10 @@
+import 'package:cleanchess/features/clean_chess/presentation/bloc/server_bloc.dart';
+import 'package:cleanchess/features/clean_chess/presentation/bloc/server_state.dart';
 import 'package:cleanchess/features/clean_chess/presentation/widgets/chart.dart';
 import 'package:cleanchess/features/clean_chess/presentation/widgets/chessboard.dart';
+import 'package:cleanchess/features/clean_chess/presentation/widgets/loading_skeleton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 const backgroundColor = Color.fromARGB(225, 17, 17, 17);
 //
@@ -29,6 +33,7 @@ String gameMode = "Standart";
 bool isStarred = true;
 Color? gainedEloColor;
 Color? gainedEloOpponentColor;
+int? elo = 1;
 
 @override
 class StatsPage extends StatelessWidget {
@@ -121,9 +126,21 @@ Widget topTitleWidgets() {
       ),
       Column(
         children: [
-          Text("$elo",
-              style:
-                  const TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+          BlocConsumer<ServerBloc, ServerState>(
+            listener: (context, state) {
+              if (state is LichessUserFetched) {
+                elo = state.user.perfs?.bullet?.rating;
+              }
+            },
+            builder: (context, state) {
+              if (elo == null) {
+                return LoadingSkeleton.small();
+              }
+              return Text("$elo",
+                  style: const TextStyle(
+                      fontSize: 25, fontWeight: FontWeight.bold));
+            },
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
